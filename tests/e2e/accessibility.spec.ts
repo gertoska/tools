@@ -29,6 +29,12 @@ test('the advanced panel has no accessibility violations', async ({ page }) => {
   expect((await scan(page)).violations).toEqual([]);
 });
 
+test('the Catalan interface has no accessibility violations', async ({ page }) => {
+  await page.goto('./');
+  await page.locator('.lang-button[data-locale="ca"]').click();
+  expect((await scan(page)).violations).toEqual([]);
+});
+
 test('the privacy page has no accessibility violations', async ({ page }) => {
   await page.goto('./privacy/');
   expect((await scan(page)).violations).toEqual([]);

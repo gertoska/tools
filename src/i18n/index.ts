@@ -1,11 +1,12 @@
+import { ca } from './ca';
 import { en, type Dictionary, type MessageKey } from './en';
 import { es } from './es';
 import { loadLocale, saveLocale } from '../lib/storage';
 
-export const LOCALES = ['en', 'es'] as const;
+export const LOCALES = ['en', 'es', 'ca'] as const;
 export type Locale = (typeof LOCALES)[number];
 
-const DICTIONARIES: Readonly<Record<Locale, Dictionary>> = { en, es };
+const DICTIONARIES: Readonly<Record<Locale, Dictionary>> = { en, es, ca };
 
 let current: Locale = 'en';
 
@@ -22,20 +23,19 @@ export function t(key: MessageKey, params?: Readonly<Record<string, string | num
   );
 }
 
-function isLocale(value: string): value is Locale {
+export function isLocale(value: string): value is Locale {
   return (LOCALES as readonly string[]).includes(value);
 }
 
-/** Stored preference first, then the browser: es or ca give Spanish, the rest English. */
+/** Stored preference first, then the browser, and English for anything else. */
 export function detectLocale(): Locale {
   const stored = loadLocale();
   if (stored !== null && isLocale(stored)) return stored;
   const languages =
     typeof navigator === 'undefined' ? [] : (navigator.languages ?? [navigator.language]);
   for (const tag of languages) {
-    const base = tag.toLowerCase().split('-')[0];
-    if (base === 'es' || base === 'ca') return 'es';
-    if (base === 'en') return 'en';
+    const base = tag.toLowerCase().split('-')[0] ?? '';
+    if (isLocale(base)) return base;
   }
   return 'en';
 }

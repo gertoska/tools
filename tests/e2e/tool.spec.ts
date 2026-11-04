@@ -44,6 +44,7 @@ async function openWithFragment(page: Page, fragment: string): Promise<void> {
 }
 
 const spanishButton = (page: Page) => page.locator('.lang-button[data-locale="es"]');
+const catalanButton = (page: Page) => page.locator('.lang-button[data-locale="ca"]');
 
 test('turns text into a slug as you type', async ({ page }) => {
   await page.locator('#input').fill('Café & Restaurant Guide: São Paulo');
@@ -135,6 +136,17 @@ test('switching language changes the whole UI without reloading or touching the 
 
   await page.reload();
   await expect(page.locator('html')).toHaveAttribute('lang', 'es');
+});
+
+test('the interface is also available in Catalan', async ({ page }) => {
+  await catalanButton(page).click();
+  await expect(page.locator('html')).toHaveAttribute('lang', 'ca');
+  await expect(catalanButton(page)).toHaveAttribute('aria-pressed', 'true');
+  await expect(spanishButton(page)).toHaveAttribute('aria-pressed', 'false');
+  await expect(page.getByText('Opcions avançades')).toBeVisible();
+
+  await page.reload();
+  await expect(page.locator('html')).toHaveAttribute('lang', 'ca');
 });
 
 test('dark mode can be forced and is remembered', async ({ page }) => {

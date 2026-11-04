@@ -18,7 +18,7 @@ leaves the page: there is no backend to send it to.
 - Bulk mode: one line, one slug, with repeats numbered `-2`, `-3`, and `.txt` / `.csv` download
 - Character counter with an SEO warning past 60 characters
 - Shareable link that carries your options and never your text
-- English and Spanish on the same URL, light and dark, keyboard accessible
+- English, Spanish and Catalan on the same URL, light and dark, keyboard accessible
 
 ## Running it
 
@@ -52,7 +52,7 @@ src/
   main.ts              startup: language, theme, store, views
   ui/                  store, tabs, single mode, bulk mode, options, theme, clipboard
   styles/              CSS variables, layout, components
-  i18n/                en.ts, es.ts and the locale runtime
+  i18n/                en.ts, es.ts, ca.ts and the locale runtime
   lib/
     slugify/           THE ENGINE: pure, no DOM, no dependencies
       index.ts         slugify() and slugifyMany()
