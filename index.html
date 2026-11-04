@@ -1,0 +1,452 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Slugify — free URL slug generator, runs in your browser</title>
+    <meta
+      name="description"
+      content="Free URL slug generator with no sign-up and no limits. Transliteration, stop words, bulk mode and dark mode. Everything runs in your browser: your text is never uploaded."
+    />
+    <link rel="canonical" href="https://gertoska.com/slugify/" />
+    <meta name="color-scheme" content="light dark" />
+    <link rel="icon" href="/slugify/favicon.svg" type="image/svg+xml" />
+    <link rel="apple-touch-icon" href="/slugify/favicon.svg" />
+
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://gertoska.com/slugify/" />
+    <meta property="og:title" content="Slugify — free URL slug generator" />
+    <meta
+      property="og:description"
+      content="Turn any title into a clean URL slug. Free, no sign-up, and your text never leaves the browser."
+    />
+    <meta property="og:image" content="https://gertoska.com/slugify/og.png" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Slugify — free URL slug generator" />
+    <meta
+      name="twitter:description"
+      content="Turn any title into a clean URL slug. Free, no sign-up, and your text never leaves the browser."
+    />
+    <meta name="twitter:image" content="https://gertoska.com/slugify/og.png" />
+
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@graph": [
+          {
+            "@type": "WebApplication",
+            "name": "Slugify",
+            "url": "https://gertoska.com/slugify/",
+            "applicationCategory": "DeveloperApplication",
+            "operatingSystem": "Any browser",
+            "description": "Free URL slug generator that runs entirely in the browser: transliteration, stop words, bulk mode and no uploads.",
+            "browserRequirements": "Requires JavaScript",
+            "isAccessibleForFree": true,
+            "offers": { "@type": "Offer", "price": "0", "priceCurrency": "EUR" }
+          },
+          {
+            "@type": "FAQPage",
+            "mainEntity": [
+              {
+                "@type": "Question",
+                "name": "Hyphen or underscore?",
+                "acceptedAnswer": {
+                  "@type": "Answer",
+                  "text": "Hyphen. Search engines read a hyphen as a word break and an underscore as a joiner, so my-blog-post counts as three words and my_blog_post as one."
+                }
+              },
+              {
+                "@type": "Question",
+                "name": "How long should a slug be?",
+                "acceptedAnswer": {
+                  "@type": "Answer",
+                  "text": "Short enough to read whole in a search result. Under 60 characters is a sensible ceiling, and three to five meaningful words beat a full sentence."
+                }
+              },
+              {
+                "@type": "Question",
+                "name": "What are stop words?",
+                "acceptedAnswer": {
+                  "@type": "Answer",
+                  "text": "Small words like the, of or and that carry little meaning on their own. Dropping them shortens a slug without losing its subject, although it can make a title read oddly."
+                }
+              },
+              {
+                "@type": "Question",
+                "name": "What does transliterating do?",
+                "acceptedAnswer": {
+                  "@type": "Answer",
+                  "text": "It rewrites letters outside a-z as their closest ASCII match: é becomes e, ß becomes ss, ñ becomes n. Accented URLs do work, but they get percent-encoded the moment they are copied."
+                }
+              },
+              {
+                "@type": "Question",
+                "name": "Does my text leave the browser?",
+                "acceptedAnswer": {
+                  "@type": "Answer",
+                  "text": "No. There is no server, no upload and no analytics. Open DevTools, watch the Network tab and type: not a single request goes out."
+                }
+              }
+            ]
+          }
+        ]
+      }
+    </script>
+
+    <script type="module" src="/src/main.ts"></script>
+  </head>
+  <body>
+    <a class="skip-link" href="#main" data-i18n="a11y.skip">Skip to the tool</a>
+
+    <header class="site-header">
+      <div class="brand">
+        <span class="brand-mark" aria-hidden="true">/</span>
+        <h1 data-i18n="app.name">Slugify</h1>
+      </div>
+      <div class="header-actions">
+        <div
+          class="lang-switcher"
+          role="group"
+          data-i18n-aria-label="lang.switcher"
+          aria-label="Interface language"
+        >
+          <button type="button" class="lang-button" data-locale="en" lang="en" aria-pressed="true">
+            EN
+          </button>
+          <button type="button" class="lang-button" data-locale="es" lang="es" aria-pressed="false">
+            ES
+          </button>
+        </div>
+        <button
+          type="button"
+          id="theme-toggle"
+          class="icon-button"
+          data-i18n-aria-label="theme.toggle"
+          aria-label="Switch between light and dark"
+        >
+          <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" focusable="false">
+            <path
+              class="icon-sun"
+              fill="currentColor"
+              d="M12 7a5 5 0 1 0 0 10 5 5 0 0 0 0-10Zm0-5a1 1 0 0 1 1 1v2a1 1 0 1 1-2 0V3a1 1 0 0 1 1-1Zm0 17a1 1 0 0 1 1 1v2a1 1 0 1 1-2 0v-2a1 1 0 0 1 1-1ZM3 11h2a1 1 0 1 1 0 2H3a1 1 0 1 1 0-2Zm16 0h2a1 1 0 1 1 0 2h-2a1 1 0 1 1 0-2ZM5.6 4.2l1.4 1.4a1 1 0 0 1-1.4 1.4L4.2 5.6a1 1 0 0 1 1.4-1.4Zm12.8 12.8 1.4 1.4a1 1 0 0 1-1.4 1.4L17 18.4a1 1 0 0 1 1.4-1.4ZM18.4 4.2a1 1 0 0 1 1.4 1.4L18.4 7A1 1 0 0 1 17 5.6Zm-12.8 12.8A1 1 0 0 1 7 18.4l-1.4 1.4a1 1 0 0 1-1.4-1.4Z"
+            />
+            <path
+              class="icon-moon"
+              fill="currentColor"
+              d="M20 14.5A8.5 8.5 0 0 1 9.5 4a8.5 8.5 0 1 0 10.5 10.5Z"
+            />
+          </svg>
+        </button>
+      </div>
+    </header>
+
+    <p class="tagline" data-i18n="app.tagline">
+      Turn any title into a clean URL slug. Free, no sign-up, and your text never leaves this page.
+    </p>
+
+    <main id="main">
+      <div class="tabs" role="tablist" data-i18n-aria-label="tabs.label" aria-label="Mode">
+        <button
+          type="button"
+          role="tab"
+          id="tab-single"
+          aria-controls="panel-single"
+          aria-selected="true"
+          data-mode="single"
+          data-i18n="tabs.single"
+        >
+          One
+        </button>
+        <button
+          type="button"
+          role="tab"
+          id="tab-bulk"
+          aria-controls="panel-bulk"
+          aria-selected="false"
+          tabindex="-1"
+          data-mode="bulk"
+          data-i18n="tabs.bulk"
+        >
+          Many
+        </button>
+      </div>
+
+      <section
+        id="panel-single"
+        role="tabpanel"
+        aria-labelledby="tab-single"
+        class="panel-grid"
+        tabindex="0"
+      >
+        <div class="panel">
+          <div class="panel-head">
+            <label for="input" data-i18n="input.label">Your text</label>
+            <button type="button" id="clear" class="link-button" data-i18n="action.clear">
+              Clear
+            </button>
+          </div>
+          <textarea
+            id="input"
+            rows="5"
+            spellcheck="false"
+            autocomplete="off"
+            data-i18n-placeholder="input.placeholder"
+            placeholder="Type or paste a title…"
+          ></textarea>
+          <div class="examples">
+            <span class="examples-label" data-i18n="examples.label">Try one:</span>
+            <button
+              type="button"
+              class="chip"
+              data-example="Café &amp; Restaurant Guide: São Paulo"
+            >
+              Café &amp; Restaurant Guide: São Paulo
+            </button>
+            <button type="button" class="chip" data-example="Fintech startups raised $34B in 2019">
+              Fintech startups raised $34B in 2019
+            </button>
+            <button type="button" class="chip" data-example="Año nuevo, ¡vida nueva!">
+              Año nuevo, ¡vida nueva!
+            </button>
+            <button type="button" class="chip" data-example="Col·legi d'Arquitectes">
+              Col·legi d'Arquitectes
+            </button>
+            <button type="button" class="chip" data-example="Über uns: die 10 größten Städte">
+              Über uns: die 10 größten Städte
+            </button>
+            <button type="button" class="chip" data-example="Baba O'Riley — The Who">
+              Baba O'Riley — The Who
+            </button>
+          </div>
+        </div>
+
+        <div class="panel">
+          <div class="panel-head">
+            <label for="output" data-i18n="result.label">Slug</label>
+            <p class="counter" id="counter" aria-live="polite"></p>
+          </div>
+          <textarea
+            id="output"
+            rows="5"
+            readonly
+            spellcheck="false"
+            data-i18n-placeholder="result.placeholder"
+            placeholder="Your slug shows up here"
+          ></textarea>
+          <p class="notice" id="empty-notice" hidden data-i18n="result.empty">
+            Nothing left to use: none of those characters could be turned into a–z or 0–9.
+          </p>
+          <div class="actions">
+            <button type="button" id="copy" class="button primary" data-i18n="action.copy">
+              Copy
+            </button>
+            <button type="button" id="copy-path" class="button" data-i18n="action.copyPath">
+              Copy as /path
+            </button>
+            <button type="button" id="copy-link" class="button" data-i18n="action.copyLink">
+              Copy link
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <section
+        id="panel-bulk"
+        role="tabpanel"
+        aria-labelledby="tab-bulk"
+        class="panel-grid"
+        tabindex="0"
+        hidden
+      >
+        <div class="panel">
+          <div class="panel-head">
+            <label for="bulk-input" data-i18n="bulk.label">One line, one slug</label>
+            <button type="button" id="bulk-clear" class="link-button" data-i18n="action.clear">
+              Clear
+            </button>
+          </div>
+          <textarea
+            id="bulk-input"
+            rows="10"
+            spellcheck="false"
+            autocomplete="off"
+            data-i18n-placeholder="bulk.placeholder"
+            placeholder="One title per line…"
+          ></textarea>
+          <label class="check">
+            <input type="checkbox" id="dedupe" checked />
+            <span data-i18n="bulk.dedupe">Number repeated slugs ( -2, -3 )</span>
+          </label>
+        </div>
+
+        <div class="panel">
+          <div class="panel-head">
+            <span class="label" data-i18n="result.label">Slug</span>
+            <p class="counter" id="bulk-summary" aria-live="polite"></p>
+          </div>
+          <div class="bulk-results">
+            <p class="notice" id="bulk-empty" data-i18n="bulk.empty">
+              Paste a list of titles to see one slug per line.
+            </p>
+            <table id="bulk-table" hidden>
+              <thead>
+                <tr>
+                  <th scope="col" data-i18n="bulk.columnOriginal">Original</th>
+                  <th scope="col" data-i18n="bulk.columnSlug">Slug</th>
+                </tr>
+              </thead>
+              <tbody id="bulk-body"></tbody>
+            </table>
+          </div>
+          <div class="actions">
+            <button type="button" id="bulk-copy" class="button primary" data-i18n="bulk.copyAll">
+              Copy all
+            </button>
+            <button type="button" id="bulk-txt" class="button" data-i18n="bulk.downloadTxt">
+              Download .txt
+            </button>
+            <button type="button" id="bulk-csv" class="button" data-i18n="bulk.downloadCsv">
+              Download .csv
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <section class="options" aria-labelledby="options-legend">
+        <div class="options-head">
+          <h2 id="options-legend" data-i18n="options.legend">Options</h2>
+          <button type="button" id="reset" class="link-button" data-i18n="action.reset">
+            Reset options
+          </button>
+        </div>
+
+        <div class="options-grid">
+          <p class="field">
+            <label for="separator" data-i18n="options.separator">Separator</label>
+            <select id="separator">
+              <option value="-" data-i18n="options.separator.dash">Hyphen ( - )</option>
+              <option value="_" data-i18n="options.separator.underscore">Underscore ( _ )</option>
+              <option value="." data-i18n="options.separator.dot">Dot ( . )</option>
+            </select>
+          </p>
+          <label class="check">
+            <input type="checkbox" id="lowercase" checked />
+            <span data-i18n="options.lowercase">Lowercase</span>
+          </label>
+          <label class="check">
+            <input type="checkbox" id="transliterate" checked />
+            <span data-i18n="options.transliterate">Transliterate accents (é → e)</span>
+          </label>
+          <label class="check">
+            <input type="checkbox" id="removeSpecialChars" checked />
+            <span data-i18n="options.removeSpecial">Remove special characters</span>
+          </label>
+          <label class="check">
+            <input type="checkbox" id="symbolsToWords" checked />
+            <span data-i18n="options.symbols">Symbols to words (&amp; → and)</span>
+          </label>
+          <label class="check">
+            <input type="checkbox" id="removeNumbers" />
+            <span data-i18n="options.removeNumbers">Remove numbers</span>
+          </label>
+        </div>
+
+        <details class="advanced">
+          <summary data-i18n="options.advanced">Advanced options</summary>
+          <div class="options-grid">
+            <p class="field">
+              <label for="language" data-i18n="options.language">Content language</label>
+              <select id="language">
+                <option value="generic" data-i18n="lang.generic">Generic</option>
+                <option value="es" data-i18n="lang.es">Spanish</option>
+                <option value="ca" data-i18n="lang.ca">Catalan</option>
+                <option value="en" data-i18n="lang.en">English</option>
+                <option value="fr" data-i18n="lang.fr">French</option>
+                <option value="de" data-i18n="lang.de">German</option>
+                <option value="it" data-i18n="lang.it">Italian</option>
+                <option value="pt" data-i18n="lang.pt">Portuguese</option>
+              </select>
+              <span class="hint" data-i18n="options.language.hint">
+                Picks the transliteration table, the symbol words and the stop word list.
+              </span>
+            </p>
+            <label class="check">
+              <input type="checkbox" id="removeStopWords" />
+              <span data-i18n="options.stopwords">Remove stop words</span>
+            </label>
+            <p class="field">
+              <label for="maxLength" data-i18n="options.maxLength">Maximum length</label>
+              <input
+                type="number"
+                id="maxLength"
+                min="0"
+                max="200"
+                step="1"
+                value="0"
+                inputmode="numeric"
+              />
+              <span class="hint" data-i18n="options.maxLength.hint"
+                >0 means no limit. Cuts at a word boundary.</span
+              >
+            </p>
+          </div>
+        </details>
+      </section>
+
+      <section class="faq">
+        <h2 data-i18n="faq.title">Questions</h2>
+        <dl>
+          <dt data-i18n="faq.q1">Hyphen or underscore?</dt>
+          <dd data-i18n="faq.a1">
+            Hyphen. Search engines read a hyphen as a word break and an underscore as a joiner, so
+            my-blog-post counts as three words and my_blog_post as one.
+          </dd>
+          <dt data-i18n="faq.q2">How long should a slug be?</dt>
+          <dd data-i18n="faq.a2">
+            Short enough to read whole in a search result. Under 60 characters is a sensible
+            ceiling, and three to five meaningful words beat a full sentence.
+          </dd>
+          <dt data-i18n="faq.q3">What are stop words?</dt>
+          <dd data-i18n="faq.a3">
+            Small words like the, of or and that carry little meaning on their own. Dropping them
+            shortens a slug without losing its subject, although it can make a title read oddly.
+          </dd>
+          <dt data-i18n="faq.q4">What does transliterating do?</dt>
+          <dd data-i18n="faq.a4">
+            It rewrites letters outside a–z as their closest ASCII match: é becomes e, ß becomes ss,
+            ñ becomes n. Accented URLs do work, but they get percent-encoded the moment they are
+            copied.
+          </dd>
+          <dt data-i18n="faq.q5">Does my text leave the browser?</dt>
+          <dd data-i18n="faq.a5">
+            No. There is no server, no upload and no analytics. Open DevTools → Network and type:
+            not a single request goes out.
+          </dd>
+          <dt data-i18n="faq.q6">Can I upload a file?</dt>
+          <dd data-i18n="faq.a6">
+            No, on purpose. Typing and pasting are the only ways in, which keeps the whole tool to
+            one small, auditable surface.
+          </dd>
+        </dl>
+      </section>
+    </main>
+
+    <footer class="site-footer">
+      <p data-i18n="footer.note">No accounts, no cookies, no analytics, no uploads.</p>
+      <nav>
+        <a href="privacy/" data-i18n="footer.privacy">Privacy</a>
+        <a
+          href="https://github.com/gertoska/slugify"
+          rel="noopener noreferrer"
+          data-i18n="footer.source"
+          >Source code</a
+        >
+        <span data-i18n="footer.license">MIT licensed</span>
+      </nav>
+    </footer>
+
+    <p id="status" role="status" aria-live="polite" class="visually-hidden"></p>
+  </body>
+</html>
