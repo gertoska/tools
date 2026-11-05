@@ -40,6 +40,30 @@ describe('POST /api/url-to-markdown', () => {
     expect(response.status).toBe(400);
   });
 
+  it('refuses a request a browser reports as coming from another site', async () => {
+    for (const site of ['cross-site', 'same-site', 'none']) {
+      const { response, body } = await post(
+        { url: 'https://example.com/' },
+        { 'sec-fetch-site': site },
+      );
+      expect(response.status).toBe(403);
+      expect(body).toEqual({ error: 'blocked' });
+    }
+  });
+
+  it('accepts one from its own origin, and one with no such header', async () => {
+    const own = await post({ url: 'http://169.254.169.254/' }, { 'sec-fetch-site': 'same-origin' });
+    expect(own.body).toEqual({ error: 'blocked' }); // got past the check, stopped by the SSRF rules
+    expect(own.response.status).toBe(403);
+    const bad = await post({}, { 'sec-fetch-site': 'same-origin' });
+    expect(bad.response.status).toBe(400); // got as far as reading the body
+  });
+
+  it('only lets its own pages read the answer', async () => {
+    const { response } = await post({});
+    expect(response.headers.get('cross-origin-resource-policy')).toBe('same-origin');
+  });
+
   it('is never cached', async () => {
     const { response } = await post({});
     expect(response.headers.get('cache-control')).toBe('no-store');

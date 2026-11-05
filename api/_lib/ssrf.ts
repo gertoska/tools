@@ -1,5 +1,5 @@
 import { BlockList, isIP } from 'node:net';
-import { FetchError } from './errors.ts';
+import { FetchError } from './errors.js';
 
 /** Only the ports a website normally answers on. */
 export const DEFAULT_PORTS: readonly number[] = [80, 443];

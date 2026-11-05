@@ -1,8 +1,8 @@
 import type { LookupAddress, LookupOptions } from 'node:dns';
 import { lookup as dnsLookup } from 'node:dns/promises';
 import { Agent, fetch } from 'undici';
-import { FetchError } from './errors.ts';
-import { DEFAULT_PORTS, isPublicAddress, parseTargetUrl } from './ssrf.ts';
+import { FetchError } from './errors.js';
+import { DEFAULT_PORTS, isPublicAddress, parseTargetUrl } from './ssrf.js';
 
 export interface SafeFetchOptions {
   /** Total time for the whole request, redirects and body included. */
@@ -27,7 +27,8 @@ const DEFAULTS = {
   timeoutMs: 8_000,
   maxBytes: 2 * 1024 * 1024,
   maxRedirects: 3,
-  userAgent: 'gertoska-tools/1.0',
+  // Names who to write to, for the owner of a site that sees us in their logs.
+  userAgent: 'gertoska-tools/1.0 (+https://gertoska.com/url-to-markdown/)',
 } as const;
 
 const REDIRECT_STATUSES = new Set([301, 302, 303, 307, 308]);

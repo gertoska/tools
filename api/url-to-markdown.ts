@@ -1,11 +1,13 @@
-import { FetchError, STATUS_BY_CODE } from './_lib/errors.ts';
-import { htmlToMarkdown } from './_lib/html-to-markdown.ts';
-import { fetchHtml } from './_lib/safe-fetch.ts';
+import { FetchError, STATUS_BY_CODE } from './_lib/errors.js';
+import { convertInWorker } from './_lib/convert.js';
+import { fetchHtml } from './_lib/safe-fetch.js';
 
 const HEADERS = {
   'content-type': 'application/json; charset=utf-8',
   // Nothing about a request is worth keeping: not in a cache, not in a log.
   'cache-control': 'no-store',
+  // Only this site's own pages may read the answer.
+  'cross-origin-resource-policy': 'same-origin',
 } as const;
 
 /** A URL is at most 2048 characters; anything near this is not a request we want. */
@@ -53,12 +55,18 @@ async function readRequest(
  * because the platform's request log records paths and query strings but not bodies.
  */
 export async function POST(request: Request): Promise<Response> {
+  // Browsers say where a request comes from. Our page is same-origin; a request
+  // that a browser reports as coming from anywhere else is somebody else's page.
+  // (Tools like curl send no such header, and the rate limit is what handles them.)
+  const site = request.headers.get('sec-fetch-site');
+  if (site !== null && site !== 'same-origin') return fail('blocked');
+
   const parsed = await readRequest(request);
   if (parsed === undefined) return fail('invalid_url');
 
   try {
     const { html, finalUrl } = await fetchHtml(parsed.url);
-    const { markdown, title, usedFallback } = htmlToMarkdown(html, finalUrl, parsed.mode);
+    const { markdown, title, usedFallback } = await convertInWorker(html, finalUrl, parsed.mode);
     return json({ markdown, title, finalUrl, usedFallback }, 200);
   } catch (error) {
     // Answer with the code alone: no URL, no upstream message, nothing logged.

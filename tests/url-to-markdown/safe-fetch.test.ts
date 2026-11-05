@@ -25,6 +25,9 @@ beforeAll(async () => {
           .writeHead(200, { 'content-type': 'text/html' })
           .end(Buffer.from('<meta charset="iso-8859-1">caf\xe9', 'latin1'));
         break;
+      case '/echo-agent':
+        response.writeHead(200, html).end(`<p>${request.headers['user-agent'] ?? ''}</p>`);
+        break;
       case '/redirect':
         response.writeHead(302, { location: '/ok' }).end();
         break;
@@ -114,6 +117,11 @@ describe('fetchHtml: happy path', () => {
   it('returns the page and its final URL', async () => {
     const result = await fetchHtml(url('/ok'), options());
     expect(result).toEqual({ html: '<h1>Hello</h1>', finalUrl: url('/ok') });
+  });
+
+  it('introduces itself, with an address the owner of a site can write to', async () => {
+    const { html } = await fetchHtml(url('/echo-agent'), options());
+    expect(html).toBe('<p>gertoska-tools/1.0 (+https://gertoska.com/url-to-markdown/)</p>');
   });
 
   it('follows a redirect and reports where it ended', async () => {

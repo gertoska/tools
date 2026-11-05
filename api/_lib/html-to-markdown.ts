@@ -2,7 +2,7 @@ import { Readability } from '@mozilla/readability';
 import { parseHTML } from 'linkedom';
 import TurndownService from 'turndown';
 import { gfm } from 'turndown-plugin-gfm';
-import { FetchError } from './errors.ts';
+import { FetchError } from './errors.js';
 
 export type ConvertMode = 'main' | 'full';
 
@@ -128,7 +128,8 @@ function assertNotPathological(html: string): void {
   let depth = 0;
   let tags = 0;
   let work = 0;
-  for (const [, closing, name = ''] of html.matchAll(/<(\/?)([a-zA-Z][\w:-]*)[^>]*>/g)) {
+  // No `[^>]*>` after the name: with no `>` to find, that tail is rescanned from every `<` (quadratic).
+  for (const [, closing, name = ''] of html.matchAll(/<(\/?)([a-zA-Z][\w:-]*)/g)) {
     work += depth;
     if (++tags > MAX_TAGS || work > MAX_WORK) throw new FetchError('too_complex');
     const tag = name.toLowerCase();
