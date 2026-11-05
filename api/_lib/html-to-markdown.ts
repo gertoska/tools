@@ -2,7 +2,7 @@ import { Readability } from '@mozilla/readability';
 import { parseHTML } from 'linkedom';
 import TurndownService from 'turndown';
 import { gfm } from 'turndown-plugin-gfm';
-import { FetchError } from './errors.ts';
+import { FetchError } from './errors.js';
 
 export type ConvertMode = 'main' | 'full';
 

@@ -1,8 +1,8 @@
 import type { LookupAddress, LookupOptions } from 'node:dns';
 import { lookup as dnsLookup } from 'node:dns/promises';
 import { Agent, fetch } from 'undici';
-import { FetchError } from './errors.ts';
-import { DEFAULT_PORTS, isPublicAddress, parseTargetUrl } from './ssrf.ts';
+import { FetchError } from './errors.js';
+import { DEFAULT_PORTS, isPublicAddress, parseTargetUrl } from './ssrf.js';
 
 export interface SafeFetchOptions {
   /** Total time for the whole request, redirects and body included. */

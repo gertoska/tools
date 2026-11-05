@@ -1,6 +1,6 @@
-import { FetchError, STATUS_BY_CODE } from './_lib/errors.ts';
-import { htmlToMarkdown } from './_lib/html-to-markdown.ts';
-import { fetchHtml } from './_lib/safe-fetch.ts';
+import { FetchError, STATUS_BY_CODE } from './_lib/errors.js';
+import { htmlToMarkdown } from './_lib/html-to-markdown.js';
+import { fetchHtml } from './_lib/safe-fetch.js';
 
 const HEADERS = {
   'content-type': 'application/json; charset=utf-8',
