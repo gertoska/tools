@@ -1,0 +1,69 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Privacy — Slugify</title>
+    <meta
+      name="description"
+      content="Slugify runs entirely in your browser. No server, no uploads, no cookies and no analytics, and you can verify it in the Network tab."
+    />
+    <link rel="canonical" href="https://gertoska.com/slugify/privacy/" />
+    <meta name="color-scheme" content="light dark" />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <script type="module" src="/src/slugify/privacy.ts"></script>
+  </head>
+  <body class="prose-page">
+    <!--@shared header brandKey="app.name" brand="Slugify"-->
+
+    <main id="main" class="prose">
+      <h2 data-i18n="privacy.title">Privacy</h2>
+      <p data-i18n="privacy.intro">
+        Slugify is a static page. It has no server of its own, no database and no analytics, so
+        there is nothing to collect.
+      </p>
+
+      <h3 data-i18n="privacy.h1">What happens to your text</h3>
+      <p data-i18n="privacy.p1">
+        It stays in the tab. Slugs are built by JavaScript running in your browser, and the text is
+        never sent anywhere, never stored and never written to the clipboard unless you click a copy
+        button.
+      </p>
+
+      <h3 data-i18n="privacy.h2">How to check that yourself</h3>
+      <p data-i18n="privacy.p2">
+        Open DevTools → Network, then type in the tool. Nothing appears. The page also ships a
+        Content-Security-Policy with connect-src 'none', which forbids the page from making any
+        network request at all after it loads.
+      </p>
+
+      <h3 data-i18n="privacy.h3">What is stored on your device</h3>
+      <p data-i18n="privacy.p3">
+        Your options, your theme and your interface language, in localStorage, so the tool opens the
+        way you left it. Never your text. Reset options removes them.
+      </p>
+
+      <h3 data-i18n="privacy.h4">Cookies and third parties</h3>
+      <p data-i18n="privacy.p4">
+        None. No cookies, no fonts, scripts or frames from other domains, no analytics and no ads —
+        including Vercel Analytics and Speed Insights.
+      </p>
+
+      <h3 data-i18n="privacy.h5">Shareable links</h3>
+      <p data-i18n="privacy.p5">
+        Copy link puts your options in the part of the URL after the # sign, which browsers never
+        send to a server. Your text is not included.
+      </p>
+
+      <h3 data-i18n="privacy.h6">Hosting</h3>
+      <p data-i18n="privacy.p6">
+        The site is served as static files by Vercel, which processes connection data such as your
+        IP address in order to deliver the page, as any web host does.
+      </p>
+
+      <p><a href="../" data-i18n="privacy.back">Back to the tool</a></p>
+    </main>
+
+    <!--@shared footer linkHref="../" linkKey="privacy.back" linkText="Back to the tool"-->
+  </body>
+</html>

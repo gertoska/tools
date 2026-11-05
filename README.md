@@ -1,8 +1,10 @@
-# Slugify
+# Tools
 
-A free URL slug generator that runs entirely in your browser.
+Small, free web tools that run entirely in your browser. The hub lives at `/` and each tool in its own folder.
 
-**https://gertoska.com/slugify/**
+| Tool    | URL                               |
+| ------- | --------------------------------- |
+| Slugify | **https://gertoska.com/slugify/** |
 
 No accounts, no limits, no ads, no analytics and no uploads. The text you type never
 leaves the page: there is no backend to send it to.
@@ -24,20 +26,20 @@ leaves the page: there is no backend to send it to.
 
 ```bash
 npm ci
-npm run dev      # http://localhost:5173/slugify/
+npm run dev      # http://localhost:5173/   (hub)  and  /slugify/
 ```
 
 | Command                    | What it does                                                                      |
 | -------------------------- | --------------------------------------------------------------------------------- |
 | `npm run dev`              | Dev server                                                                        |
-| `npm run build`            | Typecheck, then build into `dist/slugify/`                                        |
+| `npm run build`            | Typecheck, then build into `dist/`                                                |
 | `npm run preview`          | Serve the build with the production security headers                              |
 | `npm test`                 | Engine tests, property tests and performance budgets (Vitest)                     |
 | `npm run test:e2e`         | Build, then end-to-end tests in Chromium, Firefox, WebKit and mobile (Playwright) |
 | `npm run lint`             | ESLint, including the rules that forbid `innerHTML` and friends                   |
 | `npm run typecheck`        | TypeScript in strict mode                                                         |
 | `npm run test:all`         | Everything above                                                                  |
-| `node scripts/make-og.mjs` | Rebuild `public/og.png`                                                           |
+| `node scripts/make-og.mjs` | Rebuild `public/slugify/og.png`                                                   |
 
 ## How it is put together
 
@@ -46,29 +48,48 @@ HTML, CSS and TypeScript with no UI framework, built by Vite into static files.
 stay that way.
 
 ```text
-index.html             the tool, the FAQ and the examples (static HTML, in English)
-privacy/index.html     the privacy page
+index.html                 the hub: one card per tool
+<tool>/index.html          a tool's page (static HTML, in English)
+<tool>/privacy/index.html  its privacy page
 src/
-  main.ts              startup: language, theme, store, views
-  ui/                  store, tabs, single mode, bulk mode, options, theme, clipboard
-  styles/              CSS variables, layout, components
-  i18n/                en.ts, es.ts, ca.ts and the locale runtime
-  lib/
-    slugify/           THE ENGINE: pure, no DOM, no dependencies
-      index.ts         slugify() and slugifyMany()
-      pipeline.ts      the steps of the algorithm
-      options.ts       types and defaults
-      data/            transliteration, stop words, symbols and elisions per language
-    url-state.ts       allow-list (de)serialisation of the shareable state
-    storage.ts         schema-checked localStorage
-    csv.ts             CSV with formula injection neutralised
+  shared/                  everything every tool reuses
+    partials/              header.html and footer.html, spliced in at build time
+    styles/                CSS variables and the base styles (shell, buttons, switchers)
+    i18n/                  EN/ES/CA strings common to all pages and createI18n()
+    storage.ts             schema-checked localStorage for theme and language
+    theme.ts, language-switcher.ts, dom.ts
+  hub/                     the hub's script, strings and styles
+  slugify/
+    main.ts, privacy.ts    entry points
+    ui/                    store, tabs, single mode, bulk mode, options, clipboard
+    i18n/                  this tool's strings (merged with the shared ones)
+    styles/tool.css        styles only this tool needs
+    engine/                THE ENGINE: pure, no DOM, no dependencies
+      index.ts             slugify() and slugifyMany()
+      pipeline.ts          the steps of the algorithm
+      options.ts           types and defaults
+      data/                transliteration, stop words, symbols and elisions per language
+    url-state.ts           allow-list (de)serialisation of the shareable state
+    storage.ts             schema-checked localStorage for this tool's options
+    csv.ts                 CSV with formula injection neutralised
+public/                    favicon.svg, and <tool>/og.png per tool
 tests/
-  fixtures/            the shared table of cases
-  e2e/                 Playwright
+  slugify/                 engine, property and library tests (Vitest) and the shared cases
+  e2e/<tool>/, e2e/hub/    Playwright
 ```
 
-`src/lib/slugify` imports nothing from the UI and touches no DOM, so it can be tested in
+`src/slugify/engine` imports nothing from the UI and touches no DOM, so it can be tested in
 isolation, moved into a worker or published separately.
+
+### Adding a tool
+
+1. Create `<tool>/index.html` (and `<tool>/privacy/index.html` if it needs one), using
+   `<!--@shared header …-->` and `<!--@shared footer …-->` for the shell, and
+   `src/<tool>/` for its code. Import `shared/styles/*.css`, then its own styles.
+2. Build its i18n with `createI18n` from `src/shared/i18n`, spreading `COMMON_MESSAGES`.
+3. Add the name to `TOOLS` in `vite.config.ts`. That adds its pages to the build and to
+   `sitemap.xml`.
+4. Add a card in the root `index.html` and its strings in `src/hub/i18n.ts`.
 
 ### The pipeline
 
@@ -93,13 +114,15 @@ imported chunk per language, so the initial JavaScript stays around 12 KB gzippe
 
 Static files only: no servers, no serverless functions, no environment variables.
 
-- `vite.config.ts` sets `base: '/slugify/'` and `build.outDir: 'dist/slugify'`, so the
-  build already sits under `/slugify/` and Vercel serves it with no rewrites.
-- `vercel.json` carries the security headers and redirects `/` to `/slugify/`.
+- `vite.config.ts` builds the hub and every tool into `dist/` (`base: '/'`), so Vercel serves
+  `/`, `/slugify/` and the rest with no rewrites. The sitemap is generated from the same list.
+- `vercel.json` carries the security headers for every route.
 - In Vercel (Hobby plan): Framework Preset **Vite**, Build Command `npm run build`,
   Output Directory `dist`. `main` deploys to production, pull requests get previews.
-- If `gertoska.com` already points at another Vercel project, that project adds a rewrite
-  from `/slugify/:path*` to `https://<this-project>.vercel.app/slugify/:path*`.
+- If `gertoska.com` still points at another Vercel project, that project must rewrite every
+  path this one serves to `https://<this-project>.vercel.app`: `/`, `/<tool>/:path*`,
+  `/assets/:path*`, `/favicon.svg` and `/sitemap.xml`. Assets are shared between tools, so
+  they no longer live under a tool's prefix.
 
 ### Content-Security-Policy
 

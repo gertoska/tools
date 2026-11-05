@@ -1,4 +1,4 @@
-// Builds public/og.png with no dependencies: a tiny bitmap font and zlib.
+// Builds public/slugify/og.png with no dependencies: a tiny bitmap font and zlib.
 // Run with `node scripts/make-og.mjs` after changing the wording.
 import { deflateSync } from 'node:zlib';
 import { writeFileSync } from 'node:fs';
@@ -145,7 +145,7 @@ for (let y = 0; y < HEIGHT; y += 1) {
 }
 
 writeFileSync(
-  new URL('../public/og.png', import.meta.url),
+  new URL('../public/slugify/og.png', import.meta.url),
   Buffer.concat([
     Buffer.from([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a]),
     chunk('IHDR', header),
@@ -154,4 +154,4 @@ writeFileSync(
   ]),
 );
 
-console.log('public/og.png written');
+console.log('public/slugify/og.png written');

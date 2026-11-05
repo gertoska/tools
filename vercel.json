@@ -1,9 +1,8 @@
 {
   "trailingSlash": true,
-  "redirects": [{ "source": "/", "destination": "/slugify/", "permanent": false }],
   "headers": [
     {
-      "source": "/slugify/(.*)",
+      "source": "/(.*)",
       "headers": [
         {
           "key": "Content-Security-Policy",

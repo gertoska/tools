@@ -11,7 +11,7 @@ export default defineConfig({
   workers: isCI ? 1 : undefined,
   reporter: isCI ? 'github' : 'list',
   use: {
-    baseURL: `http://localhost:${PORT}/slugify/`,
+    baseURL: `http://localhost:${PORT}`,
     trace: 'on-first-retry',
   },
   projects: [

@@ -1,0 +1,278 @@
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+/* Layout rules like display:grid would otherwise beat the browser's [hidden]. */
+[hidden] {
+  display: none !important;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  margin: 0;
+  padding: 0 1rem 3rem;
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font);
+  font-size: 16px;
+  line-height: 1.55;
+  max-width: 68rem;
+  margin-inline: auto;
+}
+
+h1,
+h2,
+h3 {
+  line-height: 1.25;
+  margin: 0;
+}
+
+.site-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--gap);
+  padding: 1rem 0 0.5rem;
+}
+
+.brand {
+  display: flex;
+  align-items: baseline;
+  gap: 0.35rem;
+}
+
+.brand h1 {
+  font-size: 1.35rem;
+  letter-spacing: -0.01em;
+}
+
+.brand-mark {
+  color: var(--accent);
+  font-family: var(--font-mono);
+  font-size: 1.35rem;
+  font-weight: 700;
+}
+
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.tagline {
+  margin: 0 0 1.25rem;
+  color: var(--muted);
+  max-width: 54ch;
+}
+
+main {
+  display: block;
+}
+
+.site-footer {
+  margin-top: 3rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--border);
+  color: var(--muted);
+  font-size: 0.9rem;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+}
+
+.site-footer p {
+  margin: 0;
+}
+
+.site-footer nav {
+  display: flex;
+  gap: 1rem;
+}
+
+.prose {
+  max-width: 68ch;
+}
+
+.prose h2 {
+  font-size: 1.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.prose h3 {
+  font-size: 1.05rem;
+  margin-top: 1.75rem;
+}
+
+.prose p {
+  color: var(--muted);
+}
+
+:focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: 2px;
+}
+
+.button {
+  font: inherit;
+  font-weight: 600;
+  font-size: 0.92rem;
+  color: var(--text);
+  background: var(--surface);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-sm);
+  padding: 0.5rem 0.85rem;
+  cursor: pointer;
+}
+
+.button:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.button.primary {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: var(--accent-text);
+}
+
+.button.primary:hover {
+  background: var(--accent-hover);
+  border-color: var(--accent-hover);
+  color: var(--accent-text);
+}
+
+.button:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.link-button {
+  font: inherit;
+  font-size: 0.9rem;
+  color: var(--accent);
+  background: none;
+  border: 0;
+  border-radius: var(--radius-sm);
+  padding: 0.15rem 0.25rem;
+  cursor: pointer;
+  text-decoration: underline;
+}
+
+.icon-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.25rem;
+  height: 2.25rem;
+  color: var(--text);
+  background: var(--surface);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+}
+
+.icon-button:hover {
+  color: var(--accent);
+  border-color: var(--accent);
+}
+
+.icon-sun {
+  display: none;
+}
+
+:root[data-theme='dark'] .icon-sun,
+:root[data-theme='dark'] .icon-moon {
+  display: initial;
+}
+
+:root[data-theme='dark'] .icon-moon {
+  display: none;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']) .icon-sun {
+    display: initial;
+  }
+
+  :root:not([data-theme='light']) .icon-moon {
+    display: none;
+  }
+}
+
+.lang-switcher {
+  display: inline-flex;
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+}
+
+.lang-button {
+  font: inherit;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--muted);
+  background: var(--surface);
+  border: 0;
+  padding: 0.4rem 0.6rem;
+  cursor: pointer;
+}
+
+.lang-button + .lang-button {
+  border-left: 1px solid var(--border-strong);
+}
+
+.lang-button[aria-pressed='true'] {
+  background: var(--accent);
+  color: var(--accent-text);
+}
+
+a {
+  color: var(--accent);
+}
+
+.skip-link {
+  position: absolute;
+  left: -9999px;
+  top: 0;
+  background: var(--surface);
+  color: var(--text);
+  padding: 0.5rem 0.75rem;
+  border: 1px solid var(--accent);
+  border-radius: var(--radius-sm);
+  z-index: 10;
+}
+
+.skip-link:focus {
+  left: 0.5rem;
+  top: 0.5rem;
+}
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
