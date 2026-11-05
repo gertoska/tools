@@ -12,6 +12,7 @@
     "test:watch": "vitest",
     "test:e2e": "npm run build && playwright test",
     "typecheck": "tsc --noEmit",
+    "test:api-build": "node scripts/check-api-build.mjs",
     "lint": "eslint .",
     "format": "prettier --write .",
     "format:check": "prettier --check .",

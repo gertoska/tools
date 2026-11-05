@@ -24,8 +24,11 @@ page, copy it or download a `.md` file with optional front matter.
   equivalents are refused), at most 3 redirects each checked again, 8 s and 2 MB limits,
   HTML only
 - `api/_lib/html-to-markdown.ts`: linkedom, Readability and Turndown with GFM tables. Pages
-  nested or tagged beyond a budget are refused up front (parsing is synchronous, so a timeout
-  cannot stop it), and every attribute Markdown cannot use is stripped
+  nested or tagged beyond a budget are refused up front, and the conversion runs in a worker
+  thread (`api/_lib/convert.ts`) that is terminated after 4 s, because a timer cannot
+  interrupt synchronous code on its own thread. Every attribute Markdown cannot use is stripped.
+  `npm run test:api-build` compiles `api/` as Vercel does and runs it under plain Node, which
+  is what catches module-resolution errors that Vitest cannot
 - Pages that need JavaScript to show their text are out of scope and report an error
 - `vercel.json` lets only `/url-to-markdown/` call its own origin (`connect-src 'self'`);
   every other page keeps `connect-src 'none'`
@@ -43,6 +46,13 @@ free fetcher for anyone, so create it before announcing the tool:
 4. Action: **Log** for the first day to see real traffic, then **Too many requests (429)**
    (the page shows a "too many requests" message) or **Deny** if the dashboard asks for Pro to use 429.
 5. Publish the change.
+6. **Verify it blocks.** A rule left on Log counts but does not stop anything. Run
+   `node scripts/check-rate-limit.mjs https://gertoska.com`: it must report "Limited from
+   request 11" or so. Its requests are refused by our own code, so they cost nothing.
+7. Set up usage alerts (Vercel → Settings → Notifications and Spend Management) so a flood
+   shows up as a message before it shows up as a bill or a suspended project.
+8. Know where **Attack Challenge Mode** is (Project → Firewall): it challenges every visitor
+   and is the switch to flip if an attack comes from many IPs, which no per-IP rule can stop.
 
 ## Slugify: what it does
 

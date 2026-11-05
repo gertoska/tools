@@ -16,11 +16,19 @@ rather than a public issue. I will reply as soon as I can.
   before, so DNS rebinding cannot swap it), redirects are followed by hand and checked
   again, and time, size and content type are limited. It answers with an error code only,
   sets `no-store`, and neither stores nor logs addresses or content.
-- Pages that would take the parser minutes (thousands of nested elements) are refused before
-  parsing, because the parser is synchronous and no timeout can interrupt it.
+- The parser is synchronous, so no timeout on its own thread can interrupt it, and some pages
+  (very deep nesting, a table row of tens of thousands of cells) make it take minutes. A
+  linear scan of the tags refuses the worst before parsing, and the conversion itself runs in
+  a worker thread that is terminated after 4 seconds and limited in memory.
 - The endpoint takes POST with a JSON body only. A cross-origin page cannot call it from a
   visitor's browser (that would need a preflight, which is never answered), and the address
   never appears in a URL, so it is not in the platform's request logs.
+- Requests identify themselves as `gertoska-tools/1.0 (+https://gertoska.com/url-to-markdown/)`
+  so the owner of a site that sees them knows where to report abuse. They are GETs only.
+- A request a browser reports as cross-site (`Sec-Fetch-Site`) is refused, and answers carry
+  `Cross-Origin-Resource-Policy: same-origin`.
+- Converted Markdown is untrusted text. Pasted into an LLM, a page can carry prompt
+  injection: that is inherent to the tool, and the page is never rendered as HTML.
 - Rate limiting is a Vercel Firewall rule, set up in the dashboard (see the README).
 - No file upload and no `FileReader`. Typed or pasted text is the only input, and dropped
   files are refused.

@@ -27,7 +27,8 @@ const DEFAULTS = {
   timeoutMs: 8_000,
   maxBytes: 2 * 1024 * 1024,
   maxRedirects: 3,
-  userAgent: 'gertoska-tools/1.0',
+  // Names who to write to, for the owner of a site that sees us in their logs.
+  userAgent: 'gertoska-tools/1.0 (+https://gertoska.com/url-to-markdown/)',
 } as const;
 
 const REDIRECT_STATUSES = new Set([301, 302, 303, 307, 308]);

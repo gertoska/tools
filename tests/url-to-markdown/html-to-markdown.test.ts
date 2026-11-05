@@ -95,6 +95,18 @@ describe('htmlToMarkdown: hostile input', () => {
     );
   });
 
+  it('scans tags in linear time: thousands of unterminated tags are not a CPU bomb', () => {
+    // A tail of `[^>]*>` made this quadratic: 160 KB took over five seconds.
+    const html = `<html><body>${'<a href=1 '.repeat(20_000)}`;
+    const started = performance.now();
+    try {
+      htmlToMarkdown(html, PAGE);
+    } catch {
+      /* Whatever it decides, it has to decide quickly. */
+    }
+    expect(performance.now() - started).toBeLessThan(1_000);
+  });
+
   it('refuses a page with an absurd number of tags', () => {
     const html = `<html><body>${'<i>a</i>'.repeat(70_000)}</body></html>`;
     expect(() => htmlToMarkdown(html, PAGE)).toThrowError(
