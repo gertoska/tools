@@ -28,10 +28,12 @@ describe('convertUrl', () => {
       usedFallback: false,
     });
     const [target, init] = vi.mocked(fetch).mock.calls[0] ?? [];
-    expect(target).toBe(
-      `/api/url-to-markdown?url=${encodeURIComponent('https://example.com/?a=b&c')}&mode=full`,
-    );
-    expect(init).toMatchObject({ credentials: 'omit', cache: 'no-store' });
+    expect(target).toBe('/api/url-to-markdown');
+    expect(init).toMatchObject({ method: 'POST', credentials: 'omit', cache: 'no-store' });
+    expect(JSON.parse(init?.body as string)).toEqual({
+      url: 'https://example.com/?a=b&c',
+      mode: 'full',
+    });
   });
 
   it.each([
@@ -42,11 +44,20 @@ describe('convertUrl', () => {
     'too_large',
     'not_html',
     'empty_content',
+    'too_complex',
     'upstream_error',
     'network',
   ])('turns the server code %s into a ConversionError', async (code) => {
     respond({ error: code }, 400);
     await expect(convertUrl('x', 'main')).rejects.toMatchObject({ code });
+  });
+
+  it('recognises the firewall’s 429 even though it is not JSON from us', async () => {
+    vi.stubGlobal(
+      'fetch',
+      vi.fn(() => Promise.resolve(new Response('Too Many Requests', { status: 429 }))),
+    );
+    await expect(convertUrl('x', 'main')).rejects.toMatchObject({ code: 'rate_limited' });
   });
 
   it('treats an unknown code, a bad body and a dead network as "unknown"', async () => {

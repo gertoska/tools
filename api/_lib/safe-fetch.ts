@@ -189,6 +189,7 @@ export async function fetchHtml(
     throw new FetchError('network', { cause: error });
   } finally {
     clearTimeout(timer);
-    await dispatcher.close();
+    // Not close(): that waits for in-flight requests, and a hostile server may never end one.
+    await dispatcher.destroy();
   }
 }

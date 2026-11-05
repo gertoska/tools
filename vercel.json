@@ -1,5 +1,6 @@
 {
   "trailingSlash": true,
+  "functions": { "api/url-to-markdown.ts": { "maxDuration": 15 } },
   "headers": [
     {
       "source": "/((?!url-to-markdown/).*)",

@@ -1,12 +1,12 @@
 import AxeBuilder from '@axe-core/playwright';
-import { expect, test, type Page } from '@playwright/test';
+import { expect, test, type Page, type Request } from '@playwright/test';
 import { readFile } from 'node:fs/promises';
 
 /** The same rule set the other tools are held to. */
 const scan = (page: Page) =>
   new AxeBuilder({ page }).withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa']).analyze();
 
-const API = '**/api/url-to-markdown?*';
+const API = '**/api/url-to-markdown';
 
 const ARTICLE = {
   markdown: '# Hello\n\nA converted page.',
@@ -16,10 +16,10 @@ const ARTICLE = {
 };
 
 /** The server is not part of `vite preview`, so these tests answer for it. */
-async function answer(page: Page, body: unknown, status = 200): Promise<{ urls: string[] }> {
-  const seen = { urls: [] as string[] };
+async function answer(page: Page, body: unknown, status = 200): Promise<{ sent: Request[] }> {
+  const seen = { sent: [] as Request[] };
   await page.route(API, (route) => {
-    seen.urls.push(route.request().url());
+    seen.sent.push(route.request());
     return route.fulfill({ status, json: body });
   });
   return seen;
@@ -38,10 +38,12 @@ test('converts an address and shows the Markdown', async ({ page }) => {
   await expect(page.locator('#source')).toContainText('https://example.com/blog/mi-post');
   await expect(page.locator('#status')).toHaveText('Markdown ready');
   await expect(page.locator('#counter')).toContainText(String(ARTICLE.markdown.length));
-  expect(seen.urls).toHaveLength(1);
-  const request = new URL(seen.urls[0] ?? '');
-  expect(request.searchParams.get('url')).toBe('example.com/blog/mi-post');
-  expect(request.searchParams.get('mode')).toBe('main');
+  expect(seen.sent).toHaveLength(1);
+  const request = seen.sent[0];
+  expect(request?.method()).toBe('POST');
+  // The address travels in the body, so it never shows up in a request log.
+  expect(request?.url()).not.toContain('example.com');
+  expect(request?.postDataJSON()).toEqual({ url: 'example.com/blog/mi-post', mode: 'main' });
 });
 
 test('sends the full-page mode when it is chosen', async ({ page }) => {
@@ -50,7 +52,7 @@ test('sends the full-page mode when it is chosen', async ({ page }) => {
   await page.locator('#address').fill('https://example.com/');
   await page.locator('#address').press('Enter');
   await expect(page.locator('#output')).toHaveValue(ARTICLE.markdown);
-  expect(new URL(seen.urls[0] ?? '').searchParams.get('mode')).toBe('full');
+  expect(seen.sent[0]?.postDataJSON()).toEqual({ url: 'https://example.com/', mode: 'full' });
 });
 
 test('says so when the page had no article', async ({ page }) => {
@@ -94,7 +96,7 @@ test('asks for an address instead of sending an empty request', async ({ page })
   const seen = await answer(page, ARTICLE);
   await page.getByRole('button', { name: 'Convert' }).click();
   await expect(page.locator('#error')).toContainText('valid web address');
-  expect(seen.urls).toHaveLength(0);
+  expect(seen.sent).toHaveLength(0);
 });
 
 test('never renders the page as HTML', async ({ page }) => {

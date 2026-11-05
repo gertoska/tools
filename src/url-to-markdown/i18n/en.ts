@@ -39,8 +39,10 @@ export const en = {
   'error.not_html': 'That address is not a web page: it did not return HTML.',
   'error.empty_content':
     'No readable text found. Pages that build their content with JavaScript are not supported.',
+  'error.too_complex': 'The page is too complex to convert safely.',
   'error.upstream_error': 'The site answered with an error.',
   'error.network': 'Could not reach the site.',
+  'error.rate_limited': 'Too many requests. Wait a minute and try again.',
   'error.unknown': 'Something went wrong. Try again in a moment.',
 
   'about.title': 'Good to know',

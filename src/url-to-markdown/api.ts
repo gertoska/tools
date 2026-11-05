@@ -10,7 +10,8 @@ export interface Conversion {
   usedFallback: boolean;
 }
 
-export type ConversionErrorCode = FetchErrorCode | 'unknown';
+/** `rate_limited` comes from the firewall in front of the function, not from the function. */
+export type ConversionErrorCode = FetchErrorCode | 'rate_limited' | 'unknown';
 
 const ERROR_CODES: readonly ConversionErrorCode[] = [
   'invalid_url',
@@ -20,6 +21,7 @@ const ERROR_CODES: readonly ConversionErrorCode[] = [
   'too_large',
   'not_html',
   'empty_content',
+  'too_complex',
   'upstream_error',
   'network',
 ];
@@ -55,16 +57,19 @@ function parseErrorCode(body: unknown): ConversionErrorCode {
   return ERROR_CODES.find((known) => known === code) ?? 'unknown';
 }
 
-/** The only network request in the whole tool. Same origin, GET, nothing stored. */
+/** The only network request in the whole tool. Same origin, nothing stored. */
 export async function convertUrl(
   address: string,
   mode: ConvertMode,
   signal?: AbortSignal,
 ): Promise<Conversion> {
-  const query = new URLSearchParams({ url: address, mode });
   let response: Response;
   try {
-    response = await fetch(`/api/url-to-markdown?${query.toString()}`, {
+    // The address goes in the body: request logs keep URLs, not bodies.
+    response = await fetch('/api/url-to-markdown', {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({ url: address, mode }),
       signal,
       cache: 'no-store',
       credentials: 'omit',
@@ -74,6 +79,8 @@ export async function convertUrl(
     if (error instanceof DOMException && error.name === 'AbortError') throw error;
     throw new ConversionError('unknown');
   }
+
+  if (response.status === 429) throw new ConversionError('rate_limited');
 
   let body: unknown;
   try {

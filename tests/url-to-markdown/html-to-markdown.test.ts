@@ -81,6 +81,32 @@ describe('htmlToMarkdown: pages with no article', () => {
 });
 
 describe('htmlToMarkdown: hostile input', () => {
+  it('drops every attribute Markdown cannot use, even in HTML Turndown passes through', () => {
+    const html = `<html><body><table onclick="alert(1)" style="x"><tr><td onmouseover="alert(2)" id="a">cell content here</td></tr></table></body></html>`;
+    const { markdown } = htmlToMarkdown(html, PAGE, 'full');
+    expect(markdown).toContain('cell content here');
+    expect(markdown).not.toMatch(/onclick|onmouseover|alert|style=|id=/);
+  });
+
+  it('refuses a page nested so deep that parsing it would take minutes', () => {
+    const html = `<html><body>${'<div>'.repeat(100_000)}text</body></html>`;
+    expect(() => htmlToMarkdown(html, PAGE)).toThrowError(
+      expect.objectContaining({ code: 'too_complex' }) as Error,
+    );
+  });
+
+  it('refuses a page with an absurd number of tags', () => {
+    const html = `<html><body>${'<i>a</i>'.repeat(70_000)}</body></html>`;
+    expect(() => htmlToMarkdown(html, PAGE)).toThrowError(
+      expect.objectContaining({ code: 'too_complex' }) as Error,
+    );
+  });
+
+  it('does not mistake auto-closed tags for nesting', () => {
+    const html = `<html><body><ul>${'<li>an item of a long list that is never closed'.repeat(2000)}</ul></body></html>`;
+    expect(htmlToMarkdown(html, PAGE, 'full').markdown).toContain('an item of a long list');
+  });
+
   it('never lets a script survive into the output', () => {
     const html = `<body><h1>Title here</h1><p>Some text that is long enough to count.</p>
       <script>alert(1)</script><img src="x" onerror="alert(2)"><iframe src="https://evil.example"></iframe></body>`;

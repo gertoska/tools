@@ -16,6 +16,12 @@ rather than a public issue. I will reply as soon as I can.
   before, so DNS rebinding cannot swap it), redirects are followed by hand and checked
   again, and time, size and content type are limited. It answers with an error code only,
   sets `no-store`, and neither stores nor logs addresses or content.
+- Pages that would take the parser minutes (thousands of nested elements) are refused before
+  parsing, because the parser is synchronous and no timeout can interrupt it.
+- The endpoint takes POST with a JSON body only. A cross-origin page cannot call it from a
+  visitor's browser (that would need a preflight, which is never answered), and the address
+  never appears in a URL, so it is not in the platform's request logs.
+- Rate limiting is a Vercel Firewall rule, set up in the dashboard (see the README).
 - No file upload and no `FileReader`. Typed or pasted text is the only input, and dropped
   files are refused.
 - Runtime dependencies exist only for that function (`undici`, `linkedom`,

@@ -41,8 +41,10 @@ export const es: Dictionary = {
   'error.not_html': 'Esa dirección no es una página web: no devolvió HTML.',
   'error.empty_content':
     'No se encontró texto legible. Las páginas que construyen su contenido con JavaScript no están soportadas.',
+  'error.too_complex': 'La página es demasiado compleja para convertirla con seguridad.',
   'error.upstream_error': 'El sitio respondió con un error.',
   'error.network': 'No se pudo conectar con el sitio.',
+  'error.rate_limited': 'Demasiadas peticiones. Espera un minuto e inténtalo de nuevo.',
   'error.unknown': 'Algo salió mal. Inténtalo de nuevo en un momento.',
 
   'about.title': 'Conviene saber',

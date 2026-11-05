@@ -61,6 +61,31 @@ function resolveUrls(document: Document, base: string): void {
   }
 }
 
+/**
+ * Turndown copies a few elements through as raw HTML (a table with no header
+ * row, for one), attributes included. Keep only what Markdown can use, so no
+ * onclick or style can ride along into text someone may paste elsewhere.
+ * `class` stays because that is where Turndown reads `language-js` from.
+ */
+const KEPT_ATTRIBUTES = new Set([
+  'href',
+  'src',
+  'alt',
+  'title',
+  'class',
+  'colspan',
+  'rowspan',
+  'start',
+]);
+
+function stripAttributes(document: Document): void {
+  for (const element of document.querySelectorAll('*')) {
+    for (const { name } of Array.from(element.attributes)) {
+      if (!KEPT_ATTRIBUTES.has(name)) element.removeAttribute(name);
+    }
+  }
+}
+
 function createTurndown(): TurndownService {
   const turndown = new TurndownService({
     headingStyle: 'atx',
@@ -78,6 +103,39 @@ function tidy(markdown: string): string {
     .replace(/[ \t]+$/gm, '')
     .replace(/\n{3,}/g, '\n\n')
     .trim();
+}
+
+/** Real pages stay well under both; hostile ones are built to blow past them. */
+const MAX_DEPTH = 400;
+const MAX_TAGS = 120_000;
+/** Sum over every tag of how deep it sits: the cost the parser and extractor actually pay. */
+const MAX_WORK = 2_000_000;
+
+/** Elements with no end tag, and elements the parser closes by itself. Neither deepens the tree. */
+const FLAT = new Set(
+  'area base br col embed hr img input link meta param source track wbr p li dt dd tr td th option'.split(
+    ' ',
+  ),
+);
+
+/**
+ * Parsing and extraction are synchronous, so a timeout cannot interrupt them,
+ * and a deeply nested page makes them take quadratic time: a 2 MB pile of
+ * <div> would hold the function for minutes. A cheap linear scan of the tags
+ * refuses those before any parser sees them.
+ */
+function assertNotPathological(html: string): void {
+  let depth = 0;
+  let tags = 0;
+  let work = 0;
+  for (const [, closing, name = ''] of html.matchAll(/<(\/?)([a-zA-Z][\w:-]*)[^>]*>/g)) {
+    work += depth;
+    if (++tags > MAX_TAGS || work > MAX_WORK) throw new FetchError('too_complex');
+    const tag = name.toLowerCase();
+    if (FLAT.has(tag)) continue;
+    if (closing === '/') depth = Math.max(0, depth - 1);
+    else if (++depth > MAX_DEPTH) throw new FetchError('too_complex');
+  }
 }
 
 /**
@@ -100,10 +158,12 @@ export function htmlToMarkdown(
   pageUrl: string,
   mode: ConvertMode = 'main',
 ): ConvertResult {
+  assertNotPathological(html);
   const { document } = parseHTML(withDocumentShell(html));
 
   for (const element of document.querySelectorAll(NOISE)) element.remove();
   resolveUrls(document, pageUrl);
+  stripAttributes(document);
 
   const pageTitle = document.title.trim() || document.querySelector('h1')?.textContent.trim() || '';
 

@@ -42,8 +42,10 @@ export const ca: Dictionary = {
   'error.not_html': 'Aquesta adreça no és una pàgina web: no ha retornat HTML.',
   'error.empty_content':
     'No s’ha trobat text llegible. Les pàgines que construeixen el contingut amb JavaScript no estan suportades.',
+  'error.too_complex': 'La pàgina és massa complexa per convertir-la amb seguretat.',
   'error.upstream_error': 'El lloc ha respost amb un error.',
   'error.network': 'No s’ha pogut connectar amb el lloc.',
+  'error.rate_limited': 'Massa peticions. Espera un minut i torna-ho a provar.',
   'error.unknown': 'Alguna cosa ha anat malament. Torna-ho a provar d’aquí a un moment.',
 
   'about.title': 'Convé saber',

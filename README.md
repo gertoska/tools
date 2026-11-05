@@ -17,15 +17,32 @@ Markdown. Nothing is stored or logged.
 Paste an address, get the page as Markdown: the main content (Readability) or the full
 page, copy it or download a `.md` file with optional front matter.
 
-- `api/url-to-markdown.ts`, one Vercel Function: `GET ?url=&mode=main|full`
+- `api/url-to-markdown.ts`, one Vercel Function: `POST { url, mode: "main" | "full" }`. The
+  address is in the body, not the query string, because request logs keep URLs and not bodies
 - `api/_lib/ssrf.ts` and `safe-fetch.ts`: http(s) on ports 80 and 443 only, no credentials,
   every resolved IP checked at connect time (private, loopback, link-local and IPv6
   equivalents are refused), at most 3 redirects each checked again, 8 s and 2 MB limits,
   HTML only
-- `api/_lib/html-to-markdown.ts`: linkedom, Readability and Turndown with GFM tables
+- `api/_lib/html-to-markdown.ts`: linkedom, Readability and Turndown with GFM tables. Pages
+  nested or tagged beyond a budget are refused up front (parsing is synchronous, so a timeout
+  cannot stop it), and every attribute Markdown cannot use is stripped
 - Pages that need JavaScript to show their text are out of scope and report an error
 - `vercel.json` lets only `/url-to-markdown/` call its own origin (`connect-src 'self'`);
   every other page keeps `connect-src 'none'`
+
+### Rate limiting (set in the Vercel dashboard, not in the repo)
+
+The function does no limiting of its own: serverless instances share no memory, so a counter
+inside it would not count. The limit is one Vercel Firewall rate-limit rule, which the Hobby
+plan allows (one rule per project, counted by IP, fixed window). Without it the endpoint is a
+free fetcher for anyone, so create it before announcing the tool:
+
+1. Project → Firewall → Configure → Add New Rule → Rate Limiting.
+2. Condition: **Request Path** equals `/api/url-to-markdown`.
+3. Key **IP address**, fixed window **60 s**, limit **10** requests.
+4. Action: **Log** for the first day to see real traffic, then **Too many requests (429)**
+   (the page shows a "too many requests" message) or **Deny** if the dashboard asks for Pro to use 429.
+5. Publish the change.
 
 ## Slugify: what it does
 
