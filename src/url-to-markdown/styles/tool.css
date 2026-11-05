@@ -1,0 +1,78 @@
+.stack {
+  display: flex;
+  flex-direction: column;
+  gap: var(--gap);
+}
+
+.address-row {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.address-row input {
+  flex: 1;
+  min-width: 0;
+}
+
+.mode {
+  border: 0;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem 1.2rem;
+}
+
+.mode legend {
+  font-weight: 600;
+  font-size: 0.95rem;
+  padding: 0;
+  margin-bottom: 0.4rem;
+}
+
+.privacy-note,
+.result-source {
+  margin: 0;
+  font-size: 0.85rem;
+  color: var(--muted);
+}
+
+.result-source {
+  overflow-wrap: anywhere;
+}
+
+.counter {
+  margin: 0;
+  font-size: 0.85rem;
+  color: var(--muted);
+  text-align: right;
+}
+
+#output {
+  min-height: 18rem;
+}
+
+.about {
+  margin-top: 2.5rem;
+}
+
+.about h2 {
+  font-size: 1.2rem;
+  margin-bottom: 0.5rem;
+}
+
+.about p {
+  margin: 0;
+  color: var(--muted);
+  max-width: 70ch;
+}
+
+@media (max-width: 48rem) {
+  .address-row {
+    flex-direction: column;
+  }
+
+  #output {
+    min-height: 12rem;
+  }
+}

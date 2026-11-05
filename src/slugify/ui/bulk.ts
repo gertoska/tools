@@ -10,7 +10,7 @@ import {
   type SlugifySettings,
 } from '../engine';
 import { toCsv, toTxt } from '../csv';
-import { copyText, downloadText, type Announce } from './status';
+import { copyText, downloadText, type Announce } from '../../shared/status';
 import type { Store } from './store';
 
 const DEBOUNCE_MS = 180;

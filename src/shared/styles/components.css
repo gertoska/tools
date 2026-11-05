@@ -1,0 +1,91 @@
+/* Form and panel pieces shared by every tool. */
+
+.panel {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 0.9rem;
+}
+
+.panel-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.5rem;
+  min-height: 1.6rem;
+}
+
+label,
+.label {
+  font-weight: 600;
+  font-size: 0.95rem;
+}
+
+textarea,
+input[type='number'],
+input[type='url'],
+select {
+  font-family: inherit;
+  font-size: 1rem;
+  color: var(--text);
+  background: var(--surface-sunken);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-sm);
+  padding: 0.55rem 0.65rem;
+  width: 100%;
+}
+
+textarea {
+  font-family: var(--font-mono);
+  font-size: 0.95rem;
+  resize: vertical;
+  min-height: 7.5rem;
+}
+
+.check {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-weight: 400;
+  font-size: 0.95rem;
+  cursor: pointer;
+}
+
+.check input {
+  width: 1.05rem;
+  height: 1.05rem;
+  accent-color: var(--accent);
+  margin: 0;
+  flex: none;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  margin: 0;
+}
+
+.hint {
+  font-size: 0.82rem;
+  color: var(--muted);
+}
+
+.notice {
+  margin: 0;
+  font-size: 0.9rem;
+  color: var(--warning);
+  background: var(--warning-bg);
+  border: 1px solid currentcolor;
+  border-radius: var(--radius-sm);
+  padding: 0.5rem 0.65rem;
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}

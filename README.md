@@ -1,15 +1,33 @@
 # Tools
 
-Small, free web tools that run entirely in your browser. The hub lives at `/` and each tool in its own folder.
+Small, free web tools. The hub lives at `/` and each tool in its own folder.
 
-| Tool    | URL                               |
-| ------- | --------------------------------- |
-| Slugify | **https://gertoska.com/slugify/** |
+| Tool            | URL                                       | Where it runs                                     |
+| --------------- | ----------------------------------------- | ------------------------------------------------- |
+| Slugify         | **https://gertoska.com/slugify/**         | Entirely in your browser                          |
+| URL to Markdown | **https://gertoska.com/url-to-markdown/** | In the browser, plus one server function to fetch |
 
-No accounts, no limits, no ads, no analytics and no uploads. The text you type never
-leaves the page: there is no backend to send it to.
+No accounts, no ads and no analytics. Slugify has no backend at all: the text you type
+never leaves the page. URL to Markdown is the exception, and says so on its own page: the
+address you enter is sent to a Vercel Function that downloads the page and returns
+Markdown. Nothing is stored or logged.
 
-## What it does
+## URL to Markdown
+
+Paste an address, get the page as Markdown: the main content (Readability) or the full
+page, copy it or download a `.md` file with optional front matter.
+
+- `api/url-to-markdown.ts`, one Vercel Function: `GET ?url=&mode=main|full`
+- `api/_lib/ssrf.ts` and `safe-fetch.ts`: http(s) on ports 80 and 443 only, no credentials,
+  every resolved IP checked at connect time (private, loopback, link-local and IPv6
+  equivalents are refused), at most 3 redirects each checked again, 8 s and 2 MB limits,
+  HTML only
+- `api/_lib/html-to-markdown.ts`: linkedom, Readability and Turndown with GFM tables
+- Pages that need JavaScript to show their text are out of scope and report an error
+- `vercel.json` lets only `/url-to-markdown/` call its own origin (`connect-src 'self'`);
+  every other page keeps `connect-src 'none'`
+
+## Slugify: what it does
 
 - Live preview while you type, copy in one click, copy as `/path`
 - Separator `-`, `_` or `.`, lowercase on or off
@@ -28,6 +46,9 @@ leaves the page: there is no backend to send it to.
 npm ci
 npm run dev      # http://localhost:5173/   (hub)  and  /slugify/
 ```
+
+`npm run dev` serves the pages only; `/api` is not available there, and the end-to-end
+tests answer for it. To run the function too, use `npx vercel dev`.
 
 | Command                    | What it does                                                                      |
 | -------------------------- | --------------------------------------------------------------------------------- |
@@ -87,8 +108,9 @@ isolation, moved into a worker or published separately.
    `<!--@shared header …-->` and `<!--@shared footer …-->` for the shell, and
    `src/<tool>/` for its code. Import `shared/styles/*.css`, then its own styles.
 2. Build its i18n with `createI18n` from `src/shared/i18n`, spreading `COMMON_MESSAGES`.
-3. Add the name to `TOOLS` in `vite.config.ts`. That adds its pages to the build and to
-   `sitemap.xml`.
+3. Add it to `TOOLS` in `vite.config.ts` (`privacyPage: false` if it has none). That adds
+   its pages to the build and to `sitemap.xml`. A tool that needs the network gets its own
+   `source` rule in `vercel.json`, and the catch-all rule must exclude it.
 4. Add a card in the root `index.html` and its strings in `src/hub/i18n.ts`.
 
 ### The pipeline
@@ -112,7 +134,7 @@ imported chunk per language, so the initial JavaScript stays around 12 KB gzippe
 
 ## Deploying
 
-Static files only: no servers, no serverless functions, no environment variables.
+Static files plus one serverless function (`api/`), and no environment variables.
 
 - `vite.config.ts` builds the hub and every tool into `dist/` (`base: '/'`), so Vercel serves
   `/`, `/slugify/` and the rest with no rewrites. The sitemap is generated from the same list.
@@ -121,7 +143,7 @@ Static files only: no servers, no serverless functions, no environment variables
   Output Directory `dist`. `main` deploys to production, pull requests get previews.
 - If `gertoska.com` still points at another Vercel project, that project must rewrite every
   path this one serves to `https://<this-project>.vercel.app`: `/`, `/<tool>/:path*`,
-  `/assets/:path*`, `/favicon.svg` and `/sitemap.xml`. Assets are shared between tools, so
+  `/assets/:path*`, `/api/:path*`, `/favicon.svg` and `/sitemap.xml`. Assets are shared between tools, so
   they no longer live under a tool's prefix.
 
 ### Content-Security-Policy

@@ -1,0 +1,115 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>URL to Markdown — turn any web page into clean Markdown</title>
+    <meta
+      name="description"
+      content="Free URL to Markdown converter with no sign-up. Paste a web address, get the article as clean Markdown, then copy it or download a .md file."
+    />
+    <link rel="canonical" href="https://gertoska.com/url-to-markdown/" />
+    <meta name="color-scheme" content="light dark" />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="apple-touch-icon" href="/favicon.svg" />
+
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://gertoska.com/url-to-markdown/" />
+    <meta property="og:title" content="URL to Markdown — web page to clean Markdown" />
+    <meta
+      property="og:description"
+      content="Paste a web address and get the page as clean Markdown. Free, no sign-up."
+    />
+
+    <script type="module" src="/src/url-to-markdown/main.ts"></script>
+  </head>
+  <body>
+    <!--@shared header brandKey="app.name" brand="URL to Markdown"-->
+
+    <p class="tagline" data-i18n="app.tagline">
+      Paste a web address and get the page as clean Markdown. Free, no sign-up. Unlike the other
+      tools here, it needs our server to fetch the page.
+    </p>
+
+    <main id="main" class="stack">
+      <form id="form" class="panel" novalidate>
+        <label for="address" data-i18n="input.label">Web address</label>
+        <div class="address-row">
+          <input
+            type="text"
+            id="address"
+            inputmode="url"
+            autocomplete="off"
+            autocapitalize="off"
+            spellcheck="false"
+            required
+            data-i18n-placeholder="input.placeholder"
+            placeholder="https://example.com/blog/post"
+          />
+          <button type="submit" id="convert" class="button primary" data-i18n="action.convert">
+            Convert
+          </button>
+        </div>
+        <fieldset class="mode">
+          <legend data-i18n="mode.legend">What to convert</legend>
+          <label class="check">
+            <input type="radio" name="mode" value="main" checked />
+            <span data-i18n="mode.main">Main content only</span>
+          </label>
+          <label class="check">
+            <input type="radio" name="mode" value="full" />
+            <span data-i18n="mode.full">Full page</span>
+          </label>
+        </fieldset>
+        <p class="privacy-note" data-i18n="notice.privacy">
+          To read the page, the address you enter is sent to this site’s server, which downloads it
+          for you. Addresses and page contents are not stored or logged.
+        </p>
+        <p class="notice" id="error" role="alert" hidden></p>
+      </form>
+
+      <section class="panel" aria-labelledby="output-label">
+        <div class="panel-head">
+          <label for="output" id="output-label" data-i18n="result.label">Markdown</label>
+          <p class="counter" id="counter" aria-live="polite"></p>
+        </div>
+        <p class="result-source" id="source" hidden></p>
+        <p class="notice" id="fallback" hidden data-i18n="result.fallback">
+          No article found on this page, so the whole page was converted.
+        </p>
+        <textarea
+          id="output"
+          spellcheck="false"
+          data-i18n-placeholder="result.placeholder"
+          placeholder="The Markdown shows up here. You can edit it before copying."
+        ></textarea>
+        <label class="check">
+          <input type="checkbox" id="front-matter" checked />
+          <span data-i18n="option.frontMatter"
+            >Add front matter (title, source, date) to the download</span
+          >
+        </label>
+        <div class="actions">
+          <button type="button" id="copy" class="button primary" disabled data-i18n="action.copy">
+            Copy
+          </button>
+          <button type="button" id="download" class="button" disabled data-i18n="action.download">
+            Download .md
+          </button>
+        </div>
+      </section>
+
+      <section class="about">
+        <h2 data-i18n="about.title">Good to know</h2>
+        <p data-i18n="about.body">
+          It works with public pages that deliver their text as HTML. Pages that need JavaScript to
+          show their content, pages behind a login and pages over 2 MB are not supported.
+        </p>
+      </section>
+    </main>
+
+    <!--@shared footer linkHref="../slugify/privacy/#other-tools" linkKey="footer.privacy" linkText="Privacy"-->
+
+    <p id="status" role="status" aria-live="polite" class="visually-hidden"></p>
+  </body>
+</html>

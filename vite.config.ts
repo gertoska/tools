@@ -11,7 +11,11 @@ const SITE = 'https://gertoska.com';
  * `<name>/privacy/index.html`. To add one, create the folder and list it here;
  * the build input and the sitemap follow from this array.
  */
-const TOOLS = ['slugify'] as const;
+const TOOLS: readonly { name: string; privacyPage: boolean }[] = [
+  { name: 'slugify', privacyPage: true },
+  // Its privacy note is a section of Slugify's privacy page.
+  { name: 'url-to-markdown', privacyPage: false },
+];
 
 const root = import.meta.dirname;
 
@@ -25,14 +29,18 @@ interface Page {
 
 const PAGES: Page[] = [
   { route: '/', file: 'index.html', changefreq: 'monthly', priority: '1.0' },
-  ...TOOLS.flatMap((tool): Page[] => [
-    { route: `/${tool}/`, file: `${tool}/index.html`, changefreq: 'monthly', priority: '0.9' },
-    {
-      route: `/${tool}/privacy/`,
-      file: `${tool}/privacy/index.html`,
-      changefreq: 'yearly',
-      priority: '0.3',
-    },
+  ...TOOLS.flatMap(({ name, privacyPage }): Page[] => [
+    { route: `/${name}/`, file: `${name}/index.html`, changefreq: 'monthly', priority: '0.9' },
+    ...(privacyPage
+      ? [
+          {
+            route: `/${name}/privacy/`,
+            file: `${name}/privacy/index.html`,
+            changefreq: 'yearly' as const,
+            priority: '0.3',
+          },
+        ]
+      : []),
   ]),
 ];
 
@@ -49,13 +57,21 @@ function securityHeaders(): Plugin {
   const config = JSON.parse(readFileSync(resolve(root, 'vercel.json'), 'utf8')) as {
     headers: { source: string; headers: VercelHeader[] }[];
   };
-  const headers = config.headers.flatMap((rule) => rule.headers);
+  // A rule's `source` is a path pattern; the two forms used here are valid regular expressions.
+  const rules = config.headers.map((rule) => ({
+    source: new RegExp(`^${rule.source}$`),
+    headers: rule.headers,
+  }));
 
   return {
     name: 'tools:security-headers',
     configurePreviewServer(server) {
-      server.middlewares.use((_request, response, next) => {
-        for (const header of headers) response.setHeader(header.key, header.value);
+      server.middlewares.use((request, response, next) => {
+        const path = new URL(request.url ?? '/', 'http://localhost').pathname;
+        for (const rule of rules) {
+          if (!rule.source.test(path)) continue;
+          for (const header of rule.headers) response.setHeader(header.key, header.value);
+        }
         next();
       });
     },
