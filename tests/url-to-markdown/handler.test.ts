@@ -19,6 +19,11 @@ describe('GET /api/url-to-markdown', () => {
     expect(body).toEqual({ error: 'blocked' });
   });
 
+  it('answers 400 for an unknown mode', async () => {
+    const { response } = await call('?url=https%3A%2F%2Fexample.com%2F&mode=everything');
+    expect(response.status).toBe(400);
+  });
+
   it('is never cached', async () => {
     const { response } = await call('');
     expect(response.headers.get('cache-control')).toBe('no-store');

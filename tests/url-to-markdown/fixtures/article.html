@@ -1,0 +1,69 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <title>How we built it | Example Blog</title>
+    <script>
+      window.tracking = true;
+    </script>
+    <style>
+      body {
+        color: red;
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <nav><a href="/">Home</a> <a href="/about">About</a></nav>
+    </header>
+    <main>
+      <article>
+        <h1>How we built it</h1>
+        <p>
+          This is the first paragraph of a real article, long enough that a reader would call it
+          content. It talks about <a href="/docs/start">the docs</a>, a
+          <a href="https://other.example/page">remote page</a> and
+          <a href="javascript:alert(1)">a script link</a> that must lose its link but keep its text.
+        </p>
+        <h2>Why it works</h2>
+        <p>
+          A second paragraph keeps the article above the extraction threshold, with
+          <strong>bold</strong>, <em>emphasis</em> and <code>inline code</code>, so the extractor
+          has plenty of text to score against the navigation and the footer around it.
+        </p>
+        <img src="/img/diagram.png" alt="A diagram" />
+        <img src="data:image/png;base64,AAAA" alt="Inline pixel" />
+        <pre><code class="language-js">const x = 1;
+console.log(x);
+</code></pre>
+        <ul>
+          <li>First item</li>
+          <li>Second item</li>
+        </ul>
+        <table>
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Size</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>small</td>
+              <td>1</td>
+            </tr>
+            <tr>
+              <td>large</td>
+              <td>10</td>
+            </tr>
+          </tbody>
+        </table>
+        <p>
+          A closing paragraph that wraps the article up and makes sure the whole thing is long
+          enough to be recognised as the main content of the page by the extractor.
+        </p>
+        <form action="/subscribe"><input name="email" /><button>Subscribe now</button></form>
+      </article>
+    </main>
+    <footer>Copyright Example Blog. All rights reserved. Subscribe to our newsletter.</footer>
+  </body>
+</html>

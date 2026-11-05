@@ -10,6 +10,7 @@ export type FetchErrorCode =
   | 'timeout'
   | 'too_large'
   | 'not_html'
+  | 'empty_content'
   | 'upstream_error'
   | 'network';
 
@@ -29,6 +30,7 @@ export const STATUS_BY_CODE: Readonly<Record<FetchErrorCode, number>> = {
   blocked: 403,
   too_large: 413,
   not_html: 415,
+  empty_content: 422,
   too_many_redirects: 502,
   upstream_error: 502,
   network: 502,

@@ -1,4 +1,5 @@
 import { FetchError, STATUS_BY_CODE } from './_lib/errors.ts';
+import { htmlToMarkdown } from './_lib/html-to-markdown.ts';
 import { fetchHtml } from './_lib/safe-fetch.ts';
 
 const HEADERS = {
@@ -12,18 +13,24 @@ function json(body: unknown, status: number): Response {
 }
 
 /**
- * GET /api/url-to-markdown?url=...
+ * GET /api/url-to-markdown?url=...&mode=main|full
  *
- * Phase 2: fetches the page safely and reports what it got. The HTML to
- * Markdown conversion replaces the body below in phase 3.
+ * Answers { markdown, title, finalUrl, usedFallback }. `usedFallback` is true
+ * when "main" was asked for but the page had no article, so the whole page was
+ * converted instead. Failures answer { error: <code> } and nothing else.
  */
 export async function GET(request: Request): Promise<Response> {
-  const target = new URL(request.url).searchParams.get('url');
-  if (target === null) return json({ error: 'invalid_url' }, STATUS_BY_CODE.invalid_url);
+  const { searchParams } = new URL(request.url);
+  const target = searchParams.get('url');
+  const mode = searchParams.get('mode') ?? 'main';
+  if (target === null || (mode !== 'main' && mode !== 'full')) {
+    return json({ error: 'invalid_url' }, STATUS_BY_CODE.invalid_url);
+  }
 
   try {
     const { html, finalUrl } = await fetchHtml(target);
-    return json({ finalUrl, length: html.length }, 200);
+    const { markdown, title, usedFallback } = htmlToMarkdown(html, finalUrl, mode);
+    return json({ markdown, title, finalUrl, usedFallback }, 200);
   } catch (error) {
     // Answer with the code alone: no URL, no upstream message, nothing logged.
     const code = error instanceof FetchError ? error.code : 'network';
