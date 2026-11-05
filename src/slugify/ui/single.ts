@@ -2,7 +2,7 @@ import { all, byId } from '../../shared/dom';
 import { getLocale, t } from '../i18n';
 import { slugify, toOptions, type LanguagePack, type SlugifySettings } from '../engine';
 import { encodeSettings } from '../url-state';
-import { copyText, type Announce } from './status';
+import { copyText, type Announce } from '../../shared/status';
 import type { Store } from './store';
 
 /** Past this, a slug stops fitting in a search result. */

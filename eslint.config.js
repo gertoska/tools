@@ -54,7 +54,7 @@ export default tseslint.config(
     languageOptions: { globals: { ...globals.node } },
   },
   {
-    files: ['tests/**/*.ts', '*.config.ts'],
+    files: ['api/**/*.ts', 'tests/**/*.ts', '*.config.ts'],
     languageOptions: { globals: { ...globals.node } },
     rules: { '@typescript-eslint/no-unsafe-assignment': 'off' },
   },

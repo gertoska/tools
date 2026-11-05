@@ -22,6 +22,7 @@
     "@eslint/js": "10.0.1",
     "@lhci/cli": "0.16.0",
     "@playwright/test": "1.64.1",
+    "@types/turndown": "5.0.6",
     "eslint": "10.14.0",
     "eslint-config-prettier": "10.1.8",
     "globals": "17.14.0",
@@ -33,5 +34,12 @@
   },
   "overrides": {
     "basic-ftp": "6.2.5"
+  },
+  "dependencies": {
+    "@mozilla/readability": "0.6.0",
+    "linkedom": "0.18.15",
+    "turndown": "7.2.5",
+    "turndown-plugin-gfm": "1.0.2",
+    "undici": "8.12.4"
   }
 }

@@ -8,20 +8,35 @@ rather than a public issue. I will reply as soon as I can.
 
 ## What this project looks like from a security point of view
 
-- No backend, no API, no database, no environment variables and no secrets. If this
-  project ever needs a secret, something has gone wrong.
-- No file upload, no `FileReader` and no loading from a URL. Typed or pasted text is
-  the only input, and dropped files are refused.
-- No runtime dependencies. `dependencies` in `package.json` is empty on purpose.
+- No database, no environment variables and no secrets. If this project ever needs a
+  secret, something has gone wrong.
+- One server function, `api/url-to-markdown.ts`, which fetches a URL the visitor chose.
+  That is a server-side request forgery risk, so it is the most reviewed code here: scheme,
+  port and credentials are checked, every resolved IP is checked when connecting (not
+  before, so DNS rebinding cannot swap it), redirects are followed by hand and checked
+  again, and time, size and content type are limited. It answers with an error code only,
+  sets `no-store`, and neither stores nor logs addresses or content.
+- Pages that would take the parser minutes (thousands of nested elements) are refused before
+  parsing, because the parser is synchronous and no timeout can interrupt it.
+- The endpoint takes POST with a JSON body only. A cross-origin page cannot call it from a
+  visitor's browser (that would need a preflight, which is never answered), and the address
+  never appears in a URL, so it is not in the platform's request logs.
+- Rate limiting is a Vercel Firewall rule, set up in the dashboard (see the README).
+- No file upload and no `FileReader`. Typed or pasted text is the only input, and dropped
+  files are refused.
+- Runtime dependencies exist only for that function (`undici`, `linkedom`,
+  `@mozilla/readability`, `turndown`), and none ships to the browser.
 - Text reaches the DOM through `textContent` only. `innerHTML`, `insertAdjacentHTML`
   and `eval` are blocked by a lint rule and by the Content-Security-Policy.
-- `script-src 'self'` with no `unsafe-inline` or `unsafe-eval`, and `connect-src 'none'`,
-  so the page cannot make a network request after it loads.
+- `script-src 'self'` with no `unsafe-inline` or `unsafe-eval`. `connect-src` is `'none'`
+  everywhere except the URL to Markdown page, where it is `'self'`.
+- The converted Markdown is shown in a textarea as text, never rendered as HTML.
 - Shared links carry options in the URL fragment, parsed against an allow-list.
 - CSV downloads prefix any cell starting with `=`, `+`, `-`, `@` or a tab with `'`.
 
 ## Scope
 
-The tool runs entirely in the browser. There is no user data on any server to
+Slugify runs entirely in the browser. There is no user data on any server to
 compromise, so reports mostly concern XSS, CSP bypasses, dependency issues in the
-build chain, or anything that would make text leave the page.
+build chain, or anything that would make text leave the page. For URL to Markdown, anything
+that makes the function reach a private or internal address is in scope and urgent.

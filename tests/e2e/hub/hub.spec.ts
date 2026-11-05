@@ -10,6 +10,12 @@ test('the hub links to every tool', async ({ page }) => {
   await expect(page).toHaveURL(/\/$/);
 });
 
+test('the hub links to URL to Markdown', async ({ page }) => {
+  await page.goto('/');
+  await page.getByRole('link', { name: /URL to Markdown/ }).click();
+  await expect(page).toHaveURL(/\/url-to-markdown\/$/);
+});
+
 test('the language choice is shared between the hub and the tools', async ({ page }) => {
   await page.goto('/');
   await page.getByRole('button', { name: 'ES' }).click();

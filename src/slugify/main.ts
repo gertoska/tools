@@ -1,5 +1,6 @@
 import '../shared/styles/variables.css';
 import '../shared/styles/base.css';
+import '../shared/styles/components.css';
 import './styles/tool.css';
 
 import { applyLocale, i18n } from './i18n';
@@ -13,7 +14,7 @@ import { detectLocale } from '../shared/i18n';
 import { initLanguageSwitcher } from '../shared/language-switcher';
 import { initOptions } from './ui/options';
 import { initSingle } from './ui/single';
-import { createAnnouncer } from './ui/status';
+import { createAnnouncer } from '../shared/status';
 import { createStore } from './ui/store';
 import { initTabs } from './ui/tabs';
 import { initTheme } from '../shared/theme';

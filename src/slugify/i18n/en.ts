@@ -119,6 +119,9 @@ export const en = {
   'privacy.h6': 'Hosting',
   'privacy.p6':
     'The site is served as static files by Vercel, which processes connection data such as your IP address in order to deliver the page, as any web host does.',
+  'privacy.h7': 'Other tools on this site',
+  'privacy.p7':
+    'Everything above describes Slugify. URL to Markdown is different: to read a page it has to fetch it, so the address you enter is sent to our server, which downloads that page for you and returns the result. Addresses and page contents are not stored or logged, and nothing is shared with third parties. That tool says so on its own page, and it is the only one that makes a request.',
 } as const;
 
 export type MessageKey = keyof typeof en;

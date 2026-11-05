@@ -113,4 +113,7 @@ export const ca: Dictionary = {
   'privacy.h6': 'Allotjament',
   'privacy.p6':
     'El lloc el serveix Vercel com a fitxers estàtics, i per lliurar la pàgina tracta dades de connexió com la teva adreça IP, igual que qualsevol allotjament web.',
+  'privacy.h7': "Altres eines d'aquest lloc",
+  'privacy.p7':
+    "Tot el que hi ha més amunt descriu Slugify. URL a Markdown és diferent: per llegir una pàgina l'ha de descarregar, així que l'adreça que escrius s'envia al nostre servidor, que baixa aquesta pàgina per tu i et torna el resultat. Les adreces i el contingut de les pàgines no es desen ni es registren, i no es comparteix res amb tercers. Aquesta eina ho explica a la seva pròpia pàgina, i és l'única que fa una petició.",
 };

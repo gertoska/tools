@@ -9,7 +9,7 @@ import {
   type Separator,
   type SlugifySettings,
 } from '../engine';
-import type { Announce } from './status';
+import type { Announce } from '../../shared/status';
 import type { Store } from './store';
 
 const CHECKBOXES = [

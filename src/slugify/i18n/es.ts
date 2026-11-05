@@ -123,4 +123,7 @@ export const es: Dictionary = {
   'privacy.h6': 'Alojamiento',
   'privacy.p6':
     'El sitio lo sirve Vercel como ficheros estáticos, y para entregar la página trata datos de conexión como tu dirección IP, igual que cualquier alojamiento web.',
+  'privacy.h7': 'Otras herramientas de este sitio',
+  'privacy.p7':
+    'Todo lo anterior describe Slugify. URL a Markdown es distinta: para leer una página tiene que descargarla, así que la dirección que escribes se envía a nuestro servidor, que baja esa página por ti y devuelve el resultado. Las direcciones y el contenido de las páginas no se guardan ni se registran, y no se comparte nada con terceros. Esa herramienta lo explica en su propia página, y es la única que hace una petición.',
 };
